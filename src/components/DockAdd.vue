@@ -7,7 +7,7 @@
 
 	<div
 		class="modal fade"
-		id="backdrop-dock-add"
+		:id="'backdrop-dock-add-' + warehouse.id"
 		data-bs-backdrop="static"
 		data-bs-keyboard="false"
 		tabindex="-1"
@@ -69,23 +69,23 @@ export default {
 	},
 	methods: {
 		open_modal() {
-			new bootstrap.Modal(document.getElementById("backdrop-dock-add"), {}).show()
+			new bootstrap.Modal(document.getElementById("backdrop-dock-add-" + this.warehouse.id), {}).show()
 		},
-		add() {
+		async add() {
 			var show_valid = document.getElementById("show-valid")
 			show_valid.removeAttribute("hide")
 
 			if (this.load_type !== "Dock Load Type" && this.name !== "") {
-				showStatus.setAttribute("hide", true)
+				show_valid.setAttribute("hide", true)
 
 				const dock = db.collection("docks").doc()
-				dock.set({
+				await dock.set({
 					id: dock.id,
 					warehouse_id: this.warehouse.id,
 					load_type: this.load_type,
 					name: this.name
 				})
-				window.location.href = "admin"
+				window.location.reload()
 			}
 		}
 	}

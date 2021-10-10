@@ -72,7 +72,7 @@ export default {
 		}
 	},
 	methods: {
-		add() {
+		async add() {
 			if (this.address === "") {
 				this.address_error = true
 				return
@@ -88,7 +88,13 @@ export default {
 			modal.click()
 			modal.removeAttribute("data-bs-dismiss")
 
-			// ! api call to end point
+			const warehouse = db.collection("warehouses").doc()
+			await warehouse.set({
+				id: warehouse.id,
+				name: this.name,
+				address: this.address
+			})
+			window.location.reload()
 		},
 		open_modal() {
 			new bootstrap.Modal(document.getElementById("backdrop-warehouse-add"), {}).show()
