@@ -22,6 +22,7 @@
 import "bootstrap/dist/css/bootstrap.css"
 import { firebase } from "@firebase/app"
 import "firebase/firestore"
+import "firebase/auth"
 import DockEditable from "../components/DockEditable.vue"
 import DockAdd from "../components/DockAdd.vue"
 import WarehouseEditable from "../components/WarehouseEditable.vue"
@@ -43,6 +44,12 @@ export default {
 		}
 	},
 	created() {
+		firebase.auth().onAuthStateChanged(user => {
+			if (!user) {
+				this.$router.push("/")
+			}
+		})
+
 		db.collection("warehouses")
 			.get()
 			.then(snaps => {

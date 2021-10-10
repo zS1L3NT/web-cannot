@@ -24,4 +24,5 @@ interface Booking {
 	status: "waiting_driver" | "busy" | "completed" | "cancelled" | "waiting_completion"
 	book_time: number
 	end_time: number | null
+	eta: string
 }

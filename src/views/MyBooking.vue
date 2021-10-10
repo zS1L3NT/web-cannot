@@ -7,7 +7,7 @@
 					<p>Warehouse:</p>
 					<p>Address:</p>
 					<p>Status:</p>
-					<p v-if="booking.status === 'waiting'">Time Left:</p>
+					<p v-if="booking.status === 'waiting_driver'">Time Left:</p>
 					<p>Dock:</p>
 					<p>Load Type:</p>
 				</section>
@@ -21,7 +21,7 @@
 					<p>
 						{{ booking.status || "..." }}
 					</p>
-					<p v-if="booking.status === 'waiting'">
+					<p v-if="booking.status === 'waiting_driver'">
 						{{ time_left }}
 					</p>
 					<p>
@@ -33,7 +33,7 @@
 				</section>
 			</div>
 		</main>
-		<div v-if="booking.status === 'waiting'">
+		<div v-if="booking.status === 'waiting_driver'">
 			<button class="btn btn-main btn-success" type="button" @click="arrived">
 				Declare Arrival
 			</button>
@@ -45,6 +45,17 @@
 		<button v-if="booking.status === 'busy'" class="btn btn-main btn-success" type="button" @click="done">
 			Declare Completion
 		</button>
+
+		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast" data-bs-autohide="false">
+			<div class="toast-body">
+				The browser will request for your location. Please Allow Permission.
+				<div class="mt-2 pt-2 border-top ">
+					<button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="toast" @click="call">
+						I Understand
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<div
@@ -80,6 +91,7 @@
 
 <script>
 import "bootstrap/dist/css/bootstrap.css"
+import "@popperjs/core/dist/umd/popper.min.js"
 import * as bootstrap from "bootstrap/dist/js/bootstrap.js"
 import { firebase } from "@firebase/app"
 import "firebase/firestore"
@@ -95,21 +107,11 @@ export default {
 			booking: {},
 			warehouse: {},
 			dock: {},
-			time_left: "..."
+			time_left: "...",
+			accepted: false
 		}
 	},
 	created() {
-		if (window.navigator.geolocation) {
-			// Geolocation available
-			window.navigator.geolocation.getCurrentPosition(position => {
-				const { latitude, longitude } = position.coords
-				axios.get(`https://0d13-58-182-61-207.ngrok.io/duration?origin=${latitude},${longitude}&destination=TemasekPolytechnic`)
-					.then(res => console.log(res.data))
-					.catch(console.error)
-				console.log(latitude, longitude)
-			})
-		}
-
 		firebase.auth().onAuthStateChanged(async user => {
 			try {
 				if (user) {
@@ -168,12 +170,43 @@ export default {
 			this.time_left = `${minutes.toString().padStart(2, " ")}m ${seconds.toString().padStart(2, " ")}s`
 		}, 1000)
 	},
+	mounted() {
+		if (window.navigator.geolocation) {
+			var toast = document.getElementById("toast")
+			var bsAlert = new bootstrap.Toast(toast)
+			bsAlert.show()
+		}
+	},
 	methods: {
-		getLocation() {
-			if (window.navigator.geolocation) {
-				// Geolocation available
-				window.navigator.geolocation.getCurrentPosition(console.log, console.log)
-			}
+		feed_location() {
+			window.navigator.geolocation.getCurrentPosition(async position => {
+				this.accepted = true
+				const { latitude, longitude } = position.coords
+
+				const origin = latitude + "," + longitude
+				const destination = encodeURIComponent(this.warehouse.address)
+
+				try {
+					const res = await axios.get(
+						`https://0d13-58-182-61-207.ngrok.io/duration?origin=${origin}&destination=${destination}`
+					)
+					await db.collection("bookings")
+							.doc(this.booking.id)
+							.update({ eta: res.data })
+					setTimeout(this.feed_location, 5000)
+				} catch (e) {
+					console.error(e)
+				}
+			})
+		},
+		call() {
+			this.feed_location()
+			setTimeout(() => {
+				if (!this.accepted) {
+					var toast = document.getElementById("toast")
+					new bootstrap.Toast(toast).show()
+				}
+			}, 3000)
 		},
 		confirm() {
 			new bootstrap.Modal(document.getElementById("staticBackdrop"), {}).show()
@@ -200,7 +233,8 @@ export default {
 			db.collection("bookings")
 				.doc(this.booking.id)
 				.update({
-					status: "completed"
+					status: "completed",
+					end_time: Date.now()
 				})
 				.then(() => this.$router.push("/warehouses"))
 				.catch(console.error)
@@ -257,5 +291,12 @@ section {
 
 .btn-main {
 	margin: 10px;
+}
+
+#toast {
+	position: absolute;
+	bottom: 20px;
+	left: 50%;
+	transform: translateX(-50%);
 }
 </style>

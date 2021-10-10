@@ -5,10 +5,15 @@
 			<p>Type of docking bay: {{ dock.load_type || "" }}</p>
 			<div class="row dock-status">
 				<p>Status:</p>
-				<div v-if="dock.booking && dock.booking.status == 'waiting'" class="waiting">
+				<div v-if="dock.booking && dock.booking.status == 'waiting_driver'" class="waitDriver">
 					<b>Waiting for driver</b>
 				</div>
-				<div v-else-if="dock.booking && dock.booking.status == 'busy'" class="busy"><b>Busy</b></div>
+				<div v-else-if="dock.booking && dock.booking.status == 'busy'" class="busy">
+					<b>Busy</b>
+				</div>
+				<div v-else-if="dock.booking && dock.booking.status == 'waiting_completion'" class="waitComp">
+					<b>Waiting for completion</b>
+				</div>
 				<div v-else class="available"><b>Available</b></div>
 			</div>
 		</div>
@@ -176,8 +181,16 @@ export default {
 	margin: 0;
 }
 
-.waiting {
+.waitDriver {
 	color: blue;
+	font-size: medium;
+	width: fit-content !important;
+	padding: 0;
+	margin: 0;
+}
+
+.waitComp {
+	color: yellow;
 	font-size: medium;
 	width: fit-content !important;
 	padding: 0;

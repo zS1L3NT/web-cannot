@@ -16,33 +16,30 @@ import "firebaseui/dist/firebaseui.css"
 import "firebase/auth"
 import axios from "axios"
 
-const ui = new firebaseui.auth.AuthUI(firebase.auth())
-ui.start("#firebaseui-auth-container", {
-	callbacks: {
-		signInSuccessWithAuthResult: function(authResult) {
-			axios.post("http://5bdd-58-182-61-207.ngrok.io/login", { id: authResult.user.uid })
-			// User successfully signed in.
-			// Return type determines whether we continue the redirect automatically
-			// or whether we leave that to developer to handle.
-			return true
-		},
-		uiShown: function() {
-			// The widget is rendered.
-			// Hide the loader.
-			document.getElementById("loader").style.display = "none"
-		}
-	},
-	// Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-	signInFlow: "popup",
-	signInSuccessUrl: "warehouses",
-	signInOptions: [
-		// Leave the lines as is for the providers you want to offer your users.
-		firebase.auth.GoogleAuthProvider.PROVIDER_ID
-	]
-})
-
 export default {
-	name: "Login"
+	name: "Login",
+	mounted() {
+		new firebaseui.auth.AuthUI(firebase.auth()).start("#firebaseui-auth-container", {
+			callbacks: {
+				signInSuccessWithAuthResult(res) {
+					axios.post("https://0d13-58-182-61-207.ngrok.io/login", { id: res.user.uid })
+						.then(() => this.$router.push("/warehouses"))
+						.catch(console.error)
+				},
+				uiShown() {
+					// The widget is rendered.
+					// Hide the loader.
+					document.getElementById("loader").style.display = "none"
+				}
+			},
+			// Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+			signInFlow: "popup",
+			signInOptions: [
+				// Leave the lines as is for the providers you want to offer your users.
+				firebase.auth.GoogleAuthProvider.PROVIDER_ID
+			]
+		})
+	}
 }
 </script>
 

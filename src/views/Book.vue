@@ -22,7 +22,8 @@
 								:disabled="input_disabled(dock.id)"
 							/>
 							<label class="form-check-label" :for="dock.id">
-								{{ dock.name || "" }}
+								<p>{{ (dock.name || "") }}</p>
+								<p v-if="booking_eta(dock.id)" id="estArrival">Est. Arrival: +{{ booking_eta(dock.id) }}</p>
 							</label>
 						</div>
 					</div>
@@ -151,15 +152,19 @@ export default {
 						user_id: this.user_id,
 						dock_id: this.dock_id,
 						warehouse_id: this.warehouse.id,
-						status: "waiting",
+						status: "waiting_driver",
 						book_time: Date.now(),
-						end_time: null
+						end_time: null,
+						eta: ""
 					})
 					this.$router.push("/warehouses")
 				}
 			} catch (e) {
 				console.error(e)
 			}
+		},
+		booking_eta(dock_id) {
+			return this.bookings.find(booking => booking.dock_id === dock_id)?.eta || ""
 		}
 	}
 }
@@ -187,6 +192,16 @@ export default {
 .form-check-label {
 	font-size: 20px;
 	margin: 0 40px 0 20px;
+	display: flex;
+}
+
+.form-check-label > p {
+	width: fit-content;
+	margin: 0 10px;
+}
+
+.form-check-label > p:nth-child(2) {
+	color: red;
 }
 
 .btn-primary {
