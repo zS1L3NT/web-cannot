@@ -14,12 +14,13 @@ import * as firebaseui from "firebaseui"
 import { firebase } from "@firebase/app"
 import "firebaseui/dist/firebaseui.css"
 import "firebase/auth"
+import axios from "axios"
 
 const ui = new firebaseui.auth.AuthUI(firebase.auth())
 ui.start("#firebaseui-auth-container", {
 	callbacks: {
 		signInSuccessWithAuthResult: function(authResult) {
-			console.log(authResult)
+			axios.post("http://5bdd-58-182-61-207.ngrok.io/login", { id: authResult.user.uid })
 			// User successfully signed in.
 			// Return type determines whether we continue the redirect automatically
 			// or whether we leave that to developer to handle.

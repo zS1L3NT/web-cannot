@@ -21,7 +21,7 @@ interface Booking {
 	user_id: string
 	dock_id: string
 	warehouse_id: string
-	status: "waiting" | "busy" | "completed" | "cancelled"
+	status: "waiting_driver" | "busy" | "completed" | "cancelled" | "waiting_completion"
 	book_time: number
 	end_time: number | null
 }

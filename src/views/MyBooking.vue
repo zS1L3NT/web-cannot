@@ -84,6 +84,7 @@ import * as bootstrap from "bootstrap/dist/js/bootstrap.js"
 import { firebase } from "@firebase/app"
 import "firebase/firestore"
 import "firebase/auth"
+import axios from "axios"
 
 const db = firebase.firestore()
 
@@ -98,6 +99,17 @@ export default {
 		}
 	},
 	created() {
+		if (window.navigator.geolocation) {
+			// Geolocation available
+			window.navigator.geolocation.getCurrentPosition(position => {
+				const { latitude, longitude } = position.coords
+				axios.get(`https://0d13-58-182-61-207.ngrok.io/duration?origin=${latitude},${longitude}&destination=TemasekPolytechnic`)
+					.then(res => console.log(res.data))
+					.catch(console.error)
+				console.log(latitude, longitude)
+			})
+		}
+
 		firebase.auth().onAuthStateChanged(async user => {
 			try {
 				if (user) {
@@ -157,6 +169,12 @@ export default {
 		}, 1000)
 	},
 	methods: {
+		getLocation() {
+			if (window.navigator.geolocation) {
+				// Geolocation available
+				window.navigator.geolocation.getCurrentPosition(console.log, console.log)
+			}
+		},
 		confirm() {
 			new bootstrap.Modal(document.getElementById("staticBackdrop"), {}).show()
 		},
