@@ -152,7 +152,7 @@ export default {
 						user_id: this.user_id,
 						dock_id: this.dock_id,
 						warehouse_id: this.warehouse.id,
-						status: "waiting_driver",
+						status: "waiting_arrival",
 						book_time: Date.now(),
 						end_time: null,
 						eta: ""

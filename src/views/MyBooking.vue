@@ -7,7 +7,7 @@
 					<p>Warehouse:</p>
 					<p>Address:</p>
 					<p>Status:</p>
-					<p v-if="booking.status === 'waiting_driver'">Time Left:</p>
+					<p v-if="booking.status === 'waiting_arrival'">Time Left:</p>
 					<p>Dock:</p>
 					<p>Load Type:</p>
 				</section>
@@ -21,7 +21,7 @@
 					<p>
 						{{ booking.status || "..." }}
 					</p>
-					<p v-if="booking.status === 'waiting_driver'">
+					<p v-if="booking.status === 'waiting_arrival'">
 						{{ time_left }}
 					</p>
 					<p>
@@ -33,7 +33,7 @@
 				</section>
 			</div>
 		</main>
-		<div v-if="booking.status === 'waiting_driver'">
+		<div v-if="booking.status === 'waiting_arrival'">
 			<button class="btn btn-main btn-success" type="button" @click="arrived">
 				Declare Arrival
 			</button>
@@ -42,10 +42,12 @@
 				Cancel
 			</button>
 		</div>
-		<button v-if="booking.status === 'busy'" class="btn btn-main btn-success" type="button" @click="done">
-			Declare Completion
+		<div v-if="booking.status === 'busy'" style='font-size:large;'>
+			Please wait while docking bay is busy...
+		</div>
+		<button v-if="booking.status === 'waiting_departure'" class="btn btn-main btn-success" type="button" @click="done">
+			Declare Departure
 		</button>
-
 		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast" data-bs-autohide="false">
 			<div class="toast-body">
 				The browser will request for your location. Please Allow Permission.
@@ -226,7 +228,7 @@ export default {
 				.update({
 					status: "busy"
 				})
-				.then(() => this.$router.go(this.$router.currentRoute))
+				.then(() => window.location.reload())
 				.catch(console.error)
 		},
 		done() {

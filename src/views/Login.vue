@@ -22,8 +22,8 @@ export default {
 		new firebaseui.auth.AuthUI(firebase.auth()).start("#firebaseui-auth-container", {
 			callbacks: {
 				signInSuccessWithAuthResult(res) {
-					axios.post("https://0d13-58-182-61-207.ngrok.io/login", { id: res.user.uid })
-						.then(() => this.$router.push("/warehouses"))
+					axios.post("https://0d13-58-182-61-207.ngrok.io/login", { id: res.user.uid, email: res.user.email })
+						.then(() => window.location.href = "/warehouses")
 						.catch(console.error)
 				},
 				uiShown() {
