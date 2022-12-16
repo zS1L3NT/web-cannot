@@ -1,0 +1,25 @@
+{
+    "folders": [
+        {
+            "path": "web-express-cannot"
+        },
+        {
+            "path": "web-vue-cannot"
+        },
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "web-express-cannot": true,
+            "web-vue-cannot": true
+        }
+    }
+}
